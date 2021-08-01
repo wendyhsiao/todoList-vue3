@@ -15,12 +15,12 @@
   <div id="app">
     <div class="container">
       <div class="title">
-        <div></div>
-        <div>待辦事項</div>
-        <a @click="deleteAll" href="#" class="btn btn-delete-all">全部清除</a>
+        <div class="title-item"></div>
+        <div class="title-item2">待辦事項</div>
+        <a @click="deleteAll" href="#" class="btn btn-delete-all title-item">全部清除</a>
       </div>
       <div class="input-group">
-        <input v-model="newTodo" type="text" class="input-content" placeholder="準備要做的任務" id="newTodo">
+        <input v-model="newTodo" type="text" class="input-content" placeholder="準備要做的任務">
         <button @click="addTodo" class="btn btn-primary" type="button">新增</button>
       </div>
 
@@ -36,14 +36,22 @@
             <div v-if="!item.isEdit" class="item-content">
               <input :checked="item.isDone" @click="doneTodo(item.id)" :id="item.id" type="checkbox" class="item-checkbox">
               <label :class="{ completed: item.isDone }"  class="item-text">{{ item.todo }}</label>
-              <button @click="editTodo(item)" type="button" class="btn btn-edit"><i class="fas fa-edit"></i></button>
-              <button @click="deleteTodo(item)" type="button"  class="btn btn-delete"><i class="fas fa-trash-alt"></i></button>
+              <button @click="editTodo(item)" type="button" class="btn btn-edit">
+                <i class="fas fa-edit"></i>
+              </button>
+              <button @click="deleteTodo(item)" type="button"  class="btn btn-delete">
+                <i class="fas fa-trash-alt"></i>
+              </button>
             </div>
             
             <div v-if="item.isEdit" class="item-content">
               <input type="text" v-model="item.todo " class="item-input">
-              <button @click="doneEdit(item, 'OK')" type="button" class="btn btn-edit"><i class="far fa-check-square"></i></button>
-              <button @click="doneEdit(item, 'cancel')" type="button" class="btn btn-delete"><i class="far fa-window-close"></i></button>
+              <button @click="doneEdit(item, 'OK')" type="button" class="btn btn-edit">
+                <i class="far fa-check-square"></i>
+              </button>
+              <button @click="doneEdit(item, 'cancel')" type="button" class="btn btn-delete">
+                <i class="far fa-window-close"></i>
+              </button>
             </div>
           </li>
         </ul>
