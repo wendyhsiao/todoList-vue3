@@ -125,8 +125,8 @@
         }
       },
       mounted() {
-        this.id = JSON.parse(localStorage.getItem('id'))
-        this.todoList = JSON.parse(localStorage.getItem('todoList'))
+        this.id = JSON.parse(localStorage.getItem('id')) || 0
+        this.todoList = JSON.parse(localStorage.getItem('todoList')) || this.todoList
       },
       computed: {
         filterTodo() {
