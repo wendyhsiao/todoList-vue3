@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="zh-Hant-TW">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TodoList</title>
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.15.3/css/all.css"
+    integrity="sha384-SZXxX4whJ79/gErwcOYf+zWLeJdY/qpuqC4cAa9rOGUstPomtqpuNWT9wdPEn2fk" crossorigin="anonymous">
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+  <div id="app">
+    <div class="container">
+      <div class="title">
+        <div></div>
+        <div>待辦事項</div>
+        <a @click="deleteAll" href="#" class="btn btn-delete-all">全部清除</a>
+      </div>
+      <div class="input-group">
+        <input v-model="newTodo" type="text" class="input-content" placeholder="準備要做的任務" id="newTodo">
+        <button @click="addTodo" class="btn btn-primary" type="button">新增</button>
+      </div>
+
+      <div class="tag-group">
+        <a @click="tag = ''" :class="{active: tag === ''}" href="#" class="btn">全部</a>
+        <a @click="tag = 'undone'" :class="{active: tag === 'undone'}" href="#" class="btn">未完成</a>
+        <a @click="tag = 'done'" :class="{active: tag ==='done'}" href="#" class="btn">已完成</a>
+      </div>
+
+      <div class="list-group">
+        <ul>
+          <li v-for="item in filterTodo" :key="item.id" class="list-group-item">
+            <div v-if="!item.isEdit" class="item-content">
+              <input :checked="item.isDone" @click="doneTodo(item.id)" :id="item.id" type="checkbox" class="item-checkbox">
+              <label :class="{ completed: item.isDone }"  class="item-text">{{ item.todo }}</label>
+              <button @click="editTodo(item)" type="button" class="btn btn-edit"><i class="fas fa-edit"></i></button>
+              <button @click="deleteTodo(item)" type="button"  class="btn btn-delete"><i class="fas fa-trash-alt"></i></button>
+            </div>
+            
+            <div v-if="item.isEdit" class="item-content">
+              <input type="text" v-model="item.todo " class="item-input">
+              <button @click="doneEdit(item, 'OK')" type="button" class="btn btn-edit"><i class="far fa-check-square"></i></button>
+              <button @click="doneEdit(item, 'cancel')" type="button" class="btn btn-delete"><i class="far fa-window-close"></i></button>
+            </div>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://unpkg.com/vue@next"></script>
+  <script>
+    Vue.createApp({
+      data() {
+        return {
+          id: 0,
+          newTodo: '',
+          todoList: [],
+          tag: ''
+        }
+      },
+      methods: {
+        addTodo() {
+          this.todoList.unshift({
+            id: this.id++,
+            todo: this.newTodo,
+            isDone: false,
+            isEdit: false
+          })
+          this.newTodo = ''
+          
+          localStorage.setItem('id', JSON.stringify(this.id))
+          localStorage.setItem('todoList', JSON.stringify(this.todoList))
+        },
+        doneTodo(id) {
+          this.todoList.forEach(item => {
+            if (item.id === id) {
+              item.isDone = !item.isDone
+            }
+          })
+          localStorage.setItem('todoList', JSON.stringify(this.todoList))
+        },
+        editTodo(editItem) {
+          this.todoList.forEach(item => {
+            if (item.id === editItem.id) {
+              // 紀錄未修改內容
+              item.unmodifiedText = item.todo
+              item.isEdit = !item.isEdit
+            }
+          })
+          localStorage.setItem('todoList', JSON.stringify(this.todoList))
+        },
+        doneEdit(editItem, change) {
+          this.todoList.forEach(item => {
+            if (item.id === editItem.id) {
+              // 如果為取消，改回原本內容
+              if (change === 'cancel') { item.todo = item.unmodifiedText }
+              item.unmodifiedText = ''
+              item.isEdit = !item.isEdit
+            }
+          })
+          localStorage.setItem('todoList', JSON.stringify(this.todoList))
+        },
+        deleteTodo(deleteItem) {
+          const index = this.todoList.findIndex(item=> item.id === deleteItem.id )
+          this.todoList.splice(index, 1)
+          localStorage.setItem('todoList', JSON.stringify(this.todoList))
+        },
+        deleteAll() {
+          this.id = 0
+          this.todoList= []
+          localStorage.removeItem('id')
+          localStorage.removeItem('todoList')
+        }
+      },
+      mounted() {
+        this.id = JSON.parse(localStorage.getItem('id'))
+        this.todoList = JSON.parse(localStorage.getItem('todoList'))
+      },
+      computed: {
+        filterTodo() {
+          if (this.tag === 'done') {
+            return this.todoList.filter(item => item.isDone === true)
+          } else if (this.tag === 'undone'){
+            return this.todoList.filter(item => item.isDone === false)
+          } else {
+            return this.todoList
+          }
+        }
+      }
+    }).mount('#app');
+  </script>
+</body>
+
+</html>
